@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Snakes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <canvas id="gameCanvas" width="500" height="500">
+        Sorry your browser does not support canvas.
+    </canvas>
+    <script type="text/javascript">
+        var canvas = document.getElementById('gameCanvas');
+        var ctx = canvas.getContext("2d");
+        var w = canvas.width;
+        var h = canvas.height;
+
+        var cell_size = 10;
+        var food;
+        var snake;
+        var direction;
+        var score;
+
+        ctx.strokeStyle = "black";
+        //ctx.strokeRect(x,y,width,height);
+        ctx.strokeRect(0, 0, w, h);
+
+        function init() {
+            // Create a snake
+            create_snake();
+            // Create a food
+            create_food();
+
+            score = 0;
+            direction = "right";
+            window.onkeydown = keyEvent;
+            // Start the game
+            if(typeof game_loop != "undefined")
+                clearInterval(game_loop);
+            game_loop = setInterval(paintCanvas, 80);
+        }
+        init();
+
+        function create_snake() {
+            var snake_length = 5;
+            snake = [];
+            for(var i = snake_length - 1; i >= 0; i--) {
+                snake.push({x:i, y:0});
+            }
+        }
+
+        function create_food() {
+            food = {
+                x: Math.round(Math.random() * (w - cell_size) / cell_size), 
+                y: Math.round(Math.random() * (h - cell_size) / cell_size), 
+            };
+        }
+
+        function paintCanvas() {
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, w, h);
+            ctx.strokeStyle = "black";
+            ctx.strokeRect(0, 0, w, h);
+
+            var hx = snake[0].x;
+            var hy = snake[0].y;
+
+            if(direction == "right")
+                hx++;
+            else if(direction == "left")
+                hx--;
+            else if(direction == "up")
+                hy--;
+            else if(direction == "down")
+                hy++;
+
+            if(hx == -1 || hx == w / cell_size || hy == -1 || hy == h / cell_size || check_collision(hx, hy, snake)) {
+                init();
+                return;
+            }
+
+            if(hx == food.x && hy == food.y) {
+                // Increase the score.
+                score++;
+                create_food();
+            } else {
+                snake.pop();
+            }
+            
+            var new_head = {x: hx, y: hy};
+            snake.unshift(new_head);
+
+            for(var i = 0; i < snake.length; i++) {
+                paint_cell(snake[i].x, snake[i].y);
+            }
+
+            paint_cell(food.x, food.y);
+
+            ctx.fillStyle = "black";
+            ctx.font = "20px Georgia";
+            ctx.fillText(score, 20, 480);
+        }
+
+        function paint_cell(x, y) {
+            ctx.fillStyle = "black";
+            ctx.fillRect(x * cell_size, y * cell_size, cell_size, cell_size);
+            ctx.strokeStyle = "white";
+            ctx.strokeRect(x * cell_size, y * cell_size, cell_size, cell_size);
+        }
+
+        function check_collision(x, y, array) {
+            for(var i = 0; i < array.length; i++) {
+                if(array[i].x == x && array[i].y == y)
+                    return true;
+            }
+            return false;
+        }
+
+        function keyEvent(e) {
+            var key = e.which;
+            if(key == "37" && direction != "right")
+                direction = "left";
+            else if(key == "38" && direction != "down")
+                direction = "up";
+            else if(key == "39" && direction != "left")
+                direction = "right";
+            else if(key == "40" && direction != "up")
+                direction = "down";
+        }
+    </script>
+</body>
+</html>
