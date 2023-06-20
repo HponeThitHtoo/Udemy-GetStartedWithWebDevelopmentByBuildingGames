@@ -214,8 +214,8 @@
 
 	// PubNub subscribing
 	pubnub = new PubNub({
-		subscribeKey: "sub-c-10108ee6-f5b4-11e6-861a-0619f8945a4f",
-	    publishKey: "pub-c-4d3e61ad-3000-403d-846f-34e065573c82"
+		subscribeKey: "",
+	    publishKey: ""
 	});
 
 	pubnub.subscribe({
